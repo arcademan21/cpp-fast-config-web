@@ -157,6 +157,11 @@ function extractCreatedKey(payload: unknown): string | null {
   );
 }
 
+function derivePrefixFromRawKey(rawKey: string): string | null {
+  const match = rawKey.match(/^(cfk_[a-f0-9]{8})/i);
+  return match ? match[1] : null;
+}
+
 export function ApiKeysManager() {
   const { t } = useI18n();
   const [keys, setKeys] = useState<ApiKey[]>([]);
@@ -165,23 +170,42 @@ export function ApiKeysManager() {
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [latestKey, setLatestKey] = useState<string | null>(null);
-  const [copiedField, setCopiedField] = useState<"url" | "command" | null>(
-    null,
-  );
+  const [copiedField, setCopiedField] = useState<"command" | null>(null);
+  const [revealedKeysByPrefix, setRevealedKeysByPrefix] = useState<
+    Record<string, string>
+  >({});
+  const [hiddenKeyIds, setHiddenKeyIds] = useState<string[]>([]);
+  const [showCommand, setShowCommand] = useState(false);
 
   const selectedKey = useMemo(
     () => keys.find((key) => key.id === selectedId) ?? null,
     [keys, selectedId],
   );
 
+  const selectedResolvedKey = useMemo(() => {
+    if (!selectedKey) {
+      return t.apiKeys.commandKeyPlaceholder;
+    }
+    return (
+      revealedKeysByPrefix[selectedKey.prefix] ?? t.apiKeys.commandKeyPlaceholder
+    );
+  }, [revealedKeysByPrefix, selectedKey, t.apiKeys.commandKeyPlaceholder]);
+
   const installCommand = useMemo(() => {
-    const keyForCommand = latestKey ?? t.apiKeys.commandKeyPlaceholder;
-    return `tmp_cppfc_dir="$(mktemp -d)" && curl -fsSL ${installerUrl} | bash -s -- "$tmp_cppfc_dir" --key ${keyForCommand} --api-base-url "${installerApiBaseUrl}" --version "${installerVersion}" && bash "$tmp_cppfc_dir/install.sh" "$PWD" --cleanup-source && rm -rf "$tmp_cppfc_dir"`;
-  }, [latestKey, t.apiKeys.commandKeyPlaceholder]);
+    return `tmp_cppfc_dir="$(mktemp -d)" && curl -fsSL ${installerUrl} | bash -s -- "$tmp_cppfc_dir" --key ${selectedResolvedKey} --api-base-url "${installerApiBaseUrl}" --version "${installerVersion}" && bash "$tmp_cppfc_dir/install.sh" "$PWD" --cleanup-source && rm -rf "$tmp_cppfc_dir"`;
+  }, [selectedResolvedKey]);
+
+  const visibleKeys = useMemo(
+    () =>
+      keys.filter(
+        (key) =>
+          !hiddenKeyIds.includes(key.id) && key.status.toUpperCase() !== "REVOKED",
+      ),
+    [hiddenKeyIds, keys],
+  );
 
   const copyText = useCallback(
-    async (field: "url" | "command", text: string) => {
+    async (field: "command", text: string) => {
       try {
         await navigator.clipboard.writeText(text);
         setCopiedField(field);
@@ -191,10 +215,10 @@ export function ApiKeysManager() {
           1200,
         );
       } catch {
-        setError("Unable to copy to clipboard");
+        setError(t.apiKeys.errCopy);
       }
     },
-    [],
+    [t.apiKeys.errCopy],
   );
 
   const loadKeys = useCallback(async () => {
@@ -210,10 +234,16 @@ export function ApiKeysManager() {
       const normalized = normalizeApiKeys(payload, t.apiKeys.fallbackPrefix);
       setKeys(normalized);
 
-      if (normalized.length === 0) {
+      const normalizedVisible = normalized.filter(
+        (item) =>
+          !hiddenKeyIds.includes(item.id) &&
+          item.status.toUpperCase() !== "REVOKED",
+      );
+
+      if (normalizedVisible.length === 0) {
         setSelectedId("");
-      } else if (!normalized.some((item) => item.id === selectedId)) {
-        setSelectedId(normalized[0].id);
+      } else if (!normalizedVisible.some((item) => item.id === selectedId)) {
+        setSelectedId(normalizedVisible[0].id);
       }
     } catch (loadError) {
       setError(
@@ -222,7 +252,7 @@ export function ApiKeysManager() {
     } finally {
       setLoading(false);
     }
-  }, [selectedId, t.apiKeys.errLoad, t.apiKeys.fallbackPrefix]);
+  }, [hiddenKeyIds, selectedId, t.apiKeys.errLoad, t.apiKeys.fallbackPrefix]);
 
   useEffect(() => {
     void loadKeys();
@@ -240,7 +270,15 @@ export function ApiKeysManager() {
       });
 
       const createdKey = extractCreatedKey(payload);
-      setLatestKey(createdKey);
+      if (createdKey) {
+        const prefix = derivePrefixFromRawKey(createdKey);
+        if (prefix) {
+          setRevealedKeysByPrefix((current) => ({
+            ...current,
+            [prefix]: createdKey,
+          }));
+        }
+      }
       setMessage(
         createdKey ? t.apiKeys.msgCreatedWithToken : t.apiKeys.msgCreated,
       );
@@ -276,7 +314,15 @@ export function ApiKeysManager() {
       });
 
       const rotatedKey = extractCreatedKey(payload);
-      setLatestKey(rotatedKey);
+      if (rotatedKey) {
+        const prefix = derivePrefixFromRawKey(rotatedKey);
+        if (prefix) {
+          setRevealedKeysByPrefix((current) => ({
+            ...current,
+            [prefix]: rotatedKey,
+          }));
+        }
+      }
       setMessage(
         rotatedKey ? t.apiKeys.msgRotated : t.apiKeys.msgRotatedRequested,
       );
@@ -312,7 +358,9 @@ export function ApiKeysManager() {
       });
 
       setMessage(t.apiKeys.msgRevoked);
-      setLatestKey(null);
+      setHiddenKeyIds((current) =>
+        selectedKey ? [...new Set([...current, selectedKey.id])] : current,
+      );
       await loadKeys();
     } catch (revokeError) {
       setError(
@@ -323,6 +371,29 @@ export function ApiKeysManager() {
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const onRemoveFromList = () => {
+    if (!selectedKey) {
+      return;
+    }
+
+    setHiddenKeyIds((current) => [...new Set([...current, selectedKey.id])]);
+    setSelectedId((currentSelected) => {
+      if (currentSelected !== selectedKey.id) {
+        return currentSelected;
+      }
+
+      const next = visibleKeys.find((item) => item.id !== selectedKey.id);
+      return next ? next.id : "";
+    });
+    setMessage(t.apiKeys.msgRemovedFromList);
+  };
+
+  const onSelectKey = (keyId: string) => {
+    setSelectedId(keyId);
+    setShowCommand(false);
+    setMessage(t.apiKeys.msgSelected);
   };
 
   return (
@@ -357,6 +428,14 @@ export function ApiKeysManager() {
         >
           {t.apiKeys.revoke}
         </button>
+        <button
+          type="button"
+          onClick={onRemoveFromList}
+          disabled={actionLoading || !selectedKey}
+          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
+        >
+          {t.apiKeys.removeFromList}
+        </button>
       </div>
 
       {loading ? (
@@ -384,14 +463,14 @@ export function ApiKeysManager() {
             </tr>
           </thead>
           <tbody>
-            {keys.length === 0 ? (
+            {visibleKeys.length === 0 ? (
               <tr className="border-t border-slate-200 dark:border-slate-800">
                 <td className="px-4 py-3 text-slate-500" colSpan={4}>
                   {t.apiKeys.noKeys}
                 </td>
               </tr>
             ) : (
-              keys.map((key) => (
+              visibleKeys.map((key) => (
                 <tr
                   key={key.id}
                   className="border-t border-slate-200 dark:border-slate-800"
@@ -401,7 +480,7 @@ export function ApiKeysManager() {
                       type="radio"
                       name="selected-api-key"
                       checked={selectedId === key.id}
-                      onChange={() => setSelectedId(key.id)}
+                      onChange={() => onSelectKey(key.id)}
                     />
                   </td>
                   <td className="px-4 py-3 font-mono">{key.prefix}</td>
@@ -415,34 +494,30 @@ export function ApiKeysManager() {
       </div>
 
       <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-        <div className="mb-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            {t.apiKeys.installerUrl}
-          </p>
-          <div className="mt-2 flex items-center gap-2">
-            <pre className="command-scrollbar flex-1 overflow-x-auto text-sm text-slate-700 dark:text-slate-300">
-              <code>{installerUrl}</code>
-            </pre>
-            <button
-              type="button"
-              onClick={() => void copyText("url", installerUrl)}
-              className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
-            >
-              {copiedField === "url" ? t.common.copied : t.common.copy}
-            </button>
-          </div>
-        </div>
-
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           {t.apiKeys.installerCommand}
         </p>
         <div className="mt-2 flex items-center gap-2">
-          <pre className="command-scrollbar flex-1 overflow-x-auto text-sm text-slate-700 dark:text-slate-300">
-            <code>{installCommand}</code>
-          </pre>
+          <button
+            type="button"
+            onClick={() => setShowCommand((current) => !current)}
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
+          >
+            {showCommand ? t.apiKeys.hideCommand : t.apiKeys.showCommand}
+          </button>
+          {showCommand ? (
+            <pre className="command-scrollbar flex-1 overflow-x-auto text-sm text-slate-700 dark:text-slate-300">
+              <code>{installCommand}</code>
+            </pre>
+          ) : (
+            <p className="flex-1 rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+              {t.apiKeys.commandHidden}
+            </p>
+          )}
           <button
             type="button"
             onClick={() => void copyText("command", installCommand)}
+            disabled={!showCommand}
             className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
           >
             {copiedField === "command" ? t.common.copied : t.common.copy}
