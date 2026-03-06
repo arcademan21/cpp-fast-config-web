@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { CommandBlock } from "@/components/command-block";
 import { SiteFooter } from "@/components/footer";
+import { HomeInstallerCommandCard } from "@/components/home-installer-command-card";
 import {
   InstallerFlowTerminal,
   type InstallerFlow,
@@ -15,6 +17,8 @@ const heroFlow = `cpp init my-app\ncd my-app\ncpp all\ncpp run`;
 
 export default function Home() {
   const { t, locale } = useI18n();
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
   const flowButtons =
     locale === "es"
       ? {
@@ -243,28 +247,32 @@ export default function Home() {
             <p className="text-lg text-slate-600 dark:text-slate-300">
               {t.landing.heroSubtitle}
             </p>
-            <div className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
-              <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                {t.landing.quickInstall}
-              </p>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                {t.landing.accessDescription}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <Link
-                  href="/access"
-                  className="inline-flex rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-                >
-                  {t.common.getStarted}
-                </Link>
-                <Link
-                  href="/docs"
-                  className="inline-flex rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
-                >
-                  {t.common.viewDocs}
-                </Link>
+            {isAuthenticated ? (
+              <HomeInstallerCommandCard />
+            ) : (
+              <div className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
+                <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                  {t.landing.quickInstall}
+                </p>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                  {t.landing.accessDescription}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link
+                    href="/access"
+                    className="inline-flex rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                  >
+                    {t.common.getStarted}
+                  </Link>
+                  <Link
+                    href="/docs"
+                    className="inline-flex rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
+                  >
+                    {t.common.viewDocs}
+                  </Link>
+                </div>
               </div>
-            </div>
+            )}
           </div>
           <div className="min-w-0 space-y-4">
             <InstallerFlowTerminal

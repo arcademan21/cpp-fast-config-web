@@ -10,6 +10,14 @@ type SnippetTab = {
   code: string;
 };
 
+const installerUrl =
+  process.env.NEXT_PUBLIC_INSTALLER_URL ??
+  "https://raw.githubusercontent.com/arcademan21/cpp-fast-config/main/install.sh";
+const installerApiBaseUrl =
+  process.env.NEXT_PUBLIC_EXTERNAL_API_BASE_URL ??
+  "https://cpp-fast-config-backend.vercel.app/api";
+const installerVersion = process.env.NEXT_PUBLIC_INSTALLER_VERSION ?? "latest";
+
 export function SnippetTabs() {
   const { locale } = useI18n();
 
@@ -18,7 +26,10 @@ export function SnippetTabs() {
       {
         key: "install",
         label: locale === "es" ? "Acceso" : "Access",
-        code: "# 1) Create account in the portal\n# 2) Generate API key\ncurl -fsSL <INSTALLER_URL> | sh -s -- --key <YOUR_KEY>",
+        code:
+          locale === "es"
+            ? `# 1) Inicia sesión y entra a tu panel\n# 2) Crea o selecciona tu API key\ntmp_cppfc_dir="$(mktemp -d)" && curl -fsSL ${installerUrl} | bash -s -- "$tmp_cppfc_dir" --key <TU_KEY> --api-base-url "${installerApiBaseUrl}" --version "${installerVersion}" && bash "$tmp_cppfc_dir/install.sh" "$PWD" --cleanup-source && rm -rf "$tmp_cppfc_dir"`
+            : `# 1) Sign in and open your dashboard\n# 2) Create or select your API key\ntmp_cppfc_dir="$(mktemp -d)" && curl -fsSL ${installerUrl} | bash -s -- "$tmp_cppfc_dir" --key <YOUR_KEY> --api-base-url "${installerApiBaseUrl}" --version "${installerVersion}" && bash "$tmp_cppfc_dir/install.sh" "$PWD" --cleanup-source && rm -rf "$tmp_cppfc_dir"`,
       },
       {
         key: "init",

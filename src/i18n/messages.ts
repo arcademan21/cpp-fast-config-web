@@ -42,6 +42,10 @@ export const messages = {
       quickInstall: "Acceso",
       accessDescription:
         "Crea tu cuenta, genera una API key y usa el installer autenticado desde el portal.",
+      loadingInstallerCommand: "Cargando comando de instalación...",
+      noApiKeyYet:
+        "Aún no tienes una API key activa. Crea una en tu panel para copiar el comando listo para usar.",
+      goToApiKeys: "Ir a API Keys",
       quickWorkflow: "Flujo rápido",
       workflowDescription:
         "Toolkit terminal-first para flujos diarios en C++: init, configure, build, test, run, diagnosis y adopción de proyectos existentes.",
@@ -310,6 +314,10 @@ export const messages = {
       quickInstall: "Access",
       accessDescription:
         "Create your account, generate an API key, and run the authenticated installer from the portal.",
+      loadingInstallerCommand: "Loading installer command...",
+      noApiKeyYet:
+        "You do not have an active API key yet. Create one in your dashboard to copy the ready-to-use command.",
+      goToApiKeys: "Go to API Keys",
       quickWorkflow: "Quick workflow",
       workflowDescription:
         "Terminal-first toolkit for daily C++ workflows: init, configure, build, test, run, diagnostics, and existing-repo adoption.",

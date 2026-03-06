@@ -599,7 +599,6 @@ export function ApiKeysManager() {
           <button
             type="button"
             onClick={() => void copyText("command", installCommand)}
-            disabled={!showCommand}
             className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
           >
             {copiedField === "command" ? t.common.copied : t.common.copy}
