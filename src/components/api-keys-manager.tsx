@@ -158,6 +158,25 @@ function extractCreatedKey(payload: unknown): string | null {
   );
 }
 
+function extractCreatedKeyId(payload: unknown): string | null {
+  const root = asObject(payload);
+  if (!root) {
+    return null;
+  }
+
+  const direct = asString(root.id);
+  if (direct) {
+    return direct;
+  }
+
+  const data = asObject(root.data);
+  if (!data) {
+    return null;
+  }
+
+  return asString(data.id) || null;
+}
+
 function derivePrefixFromRawKey(rawKey: string): string | null {
   const match = rawKey.match(/^(cfk_[a-f0-9]{8})/i);
   return match ? match[1] : null;
@@ -257,7 +276,7 @@ export function ApiKeysManager() {
     [t.apiKeys.errCopy],
   );
 
-  const loadKeys = useCallback(async () => {
+  const loadKeys = useCallback(async (preferredSelectedId?: string) => {
     setLoading(true);
     setError(null);
 
@@ -276,10 +295,18 @@ export function ApiKeysManager() {
           item.status.toUpperCase() !== "REVOKED",
       );
 
+      const nextSelectedId =
+        preferredSelectedId &&
+        normalizedVisible.some((item) => item.id === preferredSelectedId)
+          ? preferredSelectedId
+          : selectedId;
+
       if (normalizedVisible.length === 0) {
         setSelectedId("");
-      } else if (!normalizedVisible.some((item) => item.id === selectedId)) {
+      } else if (!normalizedVisible.some((item) => item.id === nextSelectedId)) {
         setSelectedId(normalizedVisible[0].id);
+      } else if (nextSelectedId !== selectedId) {
+        setSelectedId(nextSelectedId);
       }
     } catch (loadError) {
       setError(
@@ -305,6 +332,7 @@ export function ApiKeysManager() {
         endpoint: apiKeysEndpoint,
       });
 
+      const createdKeyId = extractCreatedKeyId(payload);
       const createdKey = extractCreatedKey(payload);
       if (createdKey) {
         const prefix = derivePrefixFromRawKey(createdKey);
@@ -318,7 +346,7 @@ export function ApiKeysManager() {
       setMessage(
         createdKey ? t.apiKeys.msgCreatedWithToken : t.apiKeys.msgCreated,
       );
-      await loadKeys();
+      await loadKeys(createdKeyId ?? undefined);
     } catch (createError) {
       setError(
         createError instanceof Error
