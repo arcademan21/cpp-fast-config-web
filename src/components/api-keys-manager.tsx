@@ -177,18 +177,25 @@ export function ApiKeysManager() {
 
   const installCommand = useMemo(() => {
     const keyForCommand = latestKey ?? t.apiKeys.commandKeyPlaceholder;
-    return `curl -fsSL ${installerUrl} | bash -s -- "$PWD" --key ${keyForCommand} --api-base-url "${installerApiBaseUrl}" --version "${installerVersion}"`;
+    return `tmp_cppfc_dir="$(mktemp -d)" && curl -fsSL ${installerUrl} | bash -s -- "$tmp_cppfc_dir" --key ${keyForCommand} --api-base-url "${installerApiBaseUrl}" --version "${installerVersion}" && bash "$tmp_cppfc_dir/install.sh" "$PWD" --cleanup-source && rm -rf "$tmp_cppfc_dir"`;
   }, [latestKey, t.apiKeys.commandKeyPlaceholder]);
 
-  const copyText = useCallback(async (field: "url" | "command", text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedField(field);
-      setTimeout(() => setCopiedField((current) => (current === field ? null : current)), 1200);
-    } catch {
-      setError("Unable to copy to clipboard");
-    }
-  }, []);
+  const copyText = useCallback(
+    async (field: "url" | "command", text: string) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        setCopiedField(field);
+        setTimeout(
+          () =>
+            setCopiedField((current) => (current === field ? null : current)),
+          1200,
+        );
+      } catch {
+        setError("Unable to copy to clipboard");
+      }
+    },
+    [],
+  );
 
   const loadKeys = useCallback(async () => {
     setLoading(true);
