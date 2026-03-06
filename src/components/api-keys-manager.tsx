@@ -217,7 +217,17 @@ export function ApiKeysManager() {
           value.startsWith("cfk_"),
       );
 
-      setRevealedKeysByPrefix(Object.fromEntries(entries));
+      const nextRevealedKeys = entries.reduce<Record<string, string>>(
+        (acc, [prefix, value]) => {
+          if (typeof value === "string") {
+            acc[prefix] = value;
+          }
+          return acc;
+        },
+        {},
+      );
+
+      setRevealedKeysByPrefix(nextRevealedKeys);
     } catch {
       localStorage.removeItem(revealedKeysStorageKey);
     }
