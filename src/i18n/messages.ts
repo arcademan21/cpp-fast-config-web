@@ -252,7 +252,6 @@ export const messages = {
       keyPrefix: "Prefijo",
       status: "Estado",
       created: "Creada",
-      removeFromList: "Eliminar de la lista",
       fallbackPrefix: "<sin-prefijo>",
       commandKeyPlaceholder: "<TU_KEY>",
       errLoad: "No se pudieron cargar las keys",
@@ -266,7 +265,6 @@ export const messages = {
       msgRotatedRequested: "Rotación de key solicitada.",
       msgRevoked: "Key revocada.",
       msgSelected: "Key seleccionada. Comando actualizado.",
-      msgRemovedFromList: "Key eliminada de la lista visible.",
     },
   },
   en: {
@@ -516,7 +514,6 @@ export const messages = {
       keyPrefix: "Key prefix",
       status: "Status",
       created: "Created",
-      removeFromList: "Remove from list",
       fallbackPrefix: "<no-prefix>",
       commandKeyPlaceholder: "<YOUR_KEY>",
       errLoad: "Unable to load API keys",
@@ -530,7 +527,6 @@ export const messages = {
       msgRotatedRequested: "Key rotation requested.",
       msgRevoked: "Key revoked.",
       msgSelected: "Key selected. Command updated.",
-      msgRemovedFromList: "Key removed from visible list.",
     },
   },
 } as const;

@@ -194,7 +194,6 @@ export function ApiKeysManager() {
   const [revealedKeysByPrefix, setRevealedKeysByPrefix] = useState<
     Record<string, string>
   >({});
-  const [hiddenKeyIds, setHiddenKeyIds] = useState<string[]>([]);
   const [showCommand, setShowCommand] = useState(false);
 
   useEffect(() => {
@@ -250,13 +249,8 @@ export function ApiKeysManager() {
   }, [selectedResolvedKey]);
 
   const visibleKeys = useMemo(
-    () =>
-      keys.filter(
-        (key) =>
-          !hiddenKeyIds.includes(key.id) &&
-          key.status.toUpperCase() !== "REVOKED",
-      ),
-    [hiddenKeyIds, keys],
+    () => keys.filter((key) => key.status.toUpperCase() !== "REVOKED"),
+    [keys],
   );
 
   const copyText = useCallback(
@@ -276,46 +270,49 @@ export function ApiKeysManager() {
     [t.apiKeys.errCopy],
   );
 
-  const loadKeys = useCallback(async (preferredSelectedId?: string) => {
-    setLoading(true);
-    setError(null);
+  const loadKeys = useCallback(
+    async (preferredSelectedId?: string) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const payload = await callBackendProxy<unknown>({
-        method: normalizeMethod(listMethod),
-        endpoint: apiKeysEndpoint,
-      });
+      try {
+        const payload = await callBackendProxy<unknown>({
+          method: normalizeMethod(listMethod),
+          endpoint: apiKeysEndpoint,
+        });
 
-      const normalized = normalizeApiKeys(payload, t.apiKeys.fallbackPrefix);
-      setKeys(normalized);
+        const normalized = normalizeApiKeys(payload, t.apiKeys.fallbackPrefix);
+        setKeys(normalized);
 
-      const normalizedVisible = normalized.filter(
-        (item) =>
-          !hiddenKeyIds.includes(item.id) &&
-          item.status.toUpperCase() !== "REVOKED",
-      );
+        const normalizedVisible = normalized.filter(
+          (item) => item.status.toUpperCase() !== "REVOKED",
+        );
 
-      const nextSelectedId =
-        preferredSelectedId &&
-        normalizedVisible.some((item) => item.id === preferredSelectedId)
-          ? preferredSelectedId
-          : selectedId;
+        const nextSelectedId =
+          preferredSelectedId &&
+          normalizedVisible.some((item) => item.id === preferredSelectedId)
+            ? preferredSelectedId
+            : selectedId;
 
-      if (normalizedVisible.length === 0) {
-        setSelectedId("");
-      } else if (!normalizedVisible.some((item) => item.id === nextSelectedId)) {
-        setSelectedId(normalizedVisible[0].id);
-      } else if (nextSelectedId !== selectedId) {
-        setSelectedId(nextSelectedId);
+        if (normalizedVisible.length === 0) {
+          setSelectedId("");
+        } else if (
+          !normalizedVisible.some((item) => item.id === nextSelectedId)
+        ) {
+          setSelectedId(normalizedVisible[0].id);
+        } else if (nextSelectedId !== selectedId) {
+          setSelectedId(nextSelectedId);
+        }
+      } catch (loadError) {
+        setError(
+          loadError instanceof Error ? loadError.message : t.apiKeys.errLoad,
+        );
+      } finally {
+        setLoading(false);
       }
-    } catch (loadError) {
-      setError(
-        loadError instanceof Error ? loadError.message : t.apiKeys.errLoad,
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [hiddenKeyIds, selectedId, t.apiKeys.errLoad, t.apiKeys.fallbackPrefix]);
+    },
+    [selectedId, t.apiKeys.errLoad, t.apiKeys.fallbackPrefix],
+  );
 
   useEffect(() => {
     void loadKeys();
@@ -433,9 +430,6 @@ export function ApiKeysManager() {
           return next;
         });
       }
-      setHiddenKeyIds((current) =>
-        selectedKey ? [...new Set([...current, selectedKey.id])] : current,
-      );
       await loadKeys();
     } catch (revokeError) {
       setError(
@@ -446,23 +440,6 @@ export function ApiKeysManager() {
     } finally {
       setActionLoading(false);
     }
-  };
-
-  const onRemoveFromList = () => {
-    if (!selectedKey) {
-      return;
-    }
-
-    setHiddenKeyIds((current) => [...new Set([...current, selectedKey.id])]);
-    setSelectedId((currentSelected) => {
-      if (currentSelected !== selectedKey.id) {
-        return currentSelected;
-      }
-
-      const next = visibleKeys.find((item) => item.id !== selectedKey.id);
-      return next ? next.id : "";
-    });
-    setMessage(t.apiKeys.msgRemovedFromList);
   };
 
   const onSelectKey = (keyId: string) => {
@@ -502,14 +479,6 @@ export function ApiKeysManager() {
           className="rounded-md border border-rose-300 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-50 disabled:opacity-60 dark:border-rose-700 dark:text-rose-300 dark:hover:bg-rose-950/40"
         >
           {t.apiKeys.revoke}
-        </button>
-        <button
-          type="button"
-          onClick={onRemoveFromList}
-          disabled={actionLoading || !selectedKey}
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
-        >
-          {t.apiKeys.removeFromList}
         </button>
       </div>
 
