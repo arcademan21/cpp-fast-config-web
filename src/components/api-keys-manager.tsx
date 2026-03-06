@@ -166,6 +166,9 @@ export function ApiKeysManager() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [latestKey, setLatestKey] = useState<string | null>(null);
+  const [copiedField, setCopiedField] = useState<"url" | "command" | null>(
+    null,
+  );
 
   const selectedKey = useMemo(
     () => keys.find((key) => key.id === selectedId) ?? null,
@@ -174,8 +177,18 @@ export function ApiKeysManager() {
 
   const installCommand = useMemo(() => {
     const keyForCommand = latestKey ?? t.apiKeys.commandKeyPlaceholder;
-    return `tmp_installer="$(mktemp)" && curl -fsSL ${installerUrl} -o "$tmp_installer" && bash "$tmp_installer" "$PWD" --key ${keyForCommand} --api-base-url "${installerApiBaseUrl}" --version "${installerVersion}" && rm -f "$tmp_installer"`;
+    return `curl -fsSL ${installerUrl} | bash -s -- "$PWD" --key ${keyForCommand} --api-base-url "${installerApiBaseUrl}" --version "${installerVersion}"`;
   }, [latestKey, t.apiKeys.commandKeyPlaceholder]);
+
+  const copyText = useCallback(async (field: "url" | "command", text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField((current) => (current === field ? null : current)), 1200);
+    } catch {
+      setError("Unable to copy to clipboard");
+    }
+  }, []);
 
   const loadKeys = useCallback(async () => {
     setLoading(true);
@@ -395,12 +408,39 @@ export function ApiKeysManager() {
       </div>
 
       <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+        <div className="mb-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            {t.apiKeys.installerUrl}
+          </p>
+          <div className="mt-2 flex items-center gap-2">
+            <pre className="command-scrollbar flex-1 overflow-x-auto text-sm text-slate-700 dark:text-slate-300">
+              <code>{installerUrl}</code>
+            </pre>
+            <button
+              type="button"
+              onClick={() => void copyText("url", installerUrl)}
+              className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
+            >
+              {copiedField === "url" ? t.common.copied : t.common.copy}
+            </button>
+          </div>
+        </div>
+
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           {t.apiKeys.installerCommand}
         </p>
-        <pre className="command-scrollbar mt-2 overflow-x-auto text-sm text-slate-700 dark:text-slate-300">
-          <code>{installCommand}</code>
-        </pre>
+        <div className="mt-2 flex items-center gap-2">
+          <pre className="command-scrollbar flex-1 overflow-x-auto text-sm text-slate-700 dark:text-slate-300">
+            <code>{installCommand}</code>
+          </pre>
+          <button
+            type="button"
+            onClick={() => void copyText("command", installCommand)}
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
+          >
+            {copiedField === "command" ? t.common.copied : t.common.copy}
+          </button>
+        </div>
       </div>
     </section>
   );
