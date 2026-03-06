@@ -35,6 +35,7 @@ const installerApiBaseUrl =
   process.env.NEXT_PUBLIC_EXTERNAL_API_BASE_URL ??
   "https://cpp-fast-config-backend.vercel.app/api";
 const installerVersion = process.env.NEXT_PUBLIC_INSTALLER_VERSION ?? "latest";
+const revealedKeysStorageKey = "cppfc.revealedApiKeysByPrefix.v1";
 
 function normalizeMethod(value: string): string {
   const method = value.trim().toUpperCase();
@@ -177,6 +178,39 @@ export function ApiKeysManager() {
   const [hiddenKeyIds, setHiddenKeyIds] = useState<string[]>([]);
   const [showCommand, setShowCommand] = useState(false);
 
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(revealedKeysStorageKey);
+      if (!raw) {
+        return;
+      }
+
+      const parsed: unknown = JSON.parse(raw);
+      if (typeof parsed !== "object" || parsed === null) {
+        return;
+      }
+
+      const entries = Object.entries(parsed as Record<string, unknown>).filter(
+        ([prefix, value]) =>
+          typeof prefix === "string" &&
+          /^cfk_[a-f0-9]{8}$/i.test(prefix) &&
+          typeof value === "string" &&
+          value.startsWith("cfk_"),
+      );
+
+      setRevealedKeysByPrefix(Object.fromEntries(entries));
+    } catch {
+      localStorage.removeItem(revealedKeysStorageKey);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(
+      revealedKeysStorageKey,
+      JSON.stringify(revealedKeysByPrefix),
+    );
+  }, [revealedKeysByPrefix]);
+
   const selectedKey = useMemo(
     () => keys.find((key) => key.id === selectedId) ?? null,
     [keys, selectedId],
@@ -187,7 +221,8 @@ export function ApiKeysManager() {
       return t.apiKeys.commandKeyPlaceholder;
     }
     return (
-      revealedKeysByPrefix[selectedKey.prefix] ?? t.apiKeys.commandKeyPlaceholder
+      revealedKeysByPrefix[selectedKey.prefix] ??
+      t.apiKeys.commandKeyPlaceholder
     );
   }, [revealedKeysByPrefix, selectedKey, t.apiKeys.commandKeyPlaceholder]);
 
@@ -199,7 +234,8 @@ export function ApiKeysManager() {
     () =>
       keys.filter(
         (key) =>
-          !hiddenKeyIds.includes(key.id) && key.status.toUpperCase() !== "REVOKED",
+          !hiddenKeyIds.includes(key.id) &&
+          key.status.toUpperCase() !== "REVOKED",
       ),
     [hiddenKeyIds, keys],
   );
@@ -358,6 +394,17 @@ export function ApiKeysManager() {
       });
 
       setMessage(t.apiKeys.msgRevoked);
+      if (selectedKey) {
+        setRevealedKeysByPrefix((current) => {
+          if (!(selectedKey.prefix in current)) {
+            return current;
+          }
+
+          const next = { ...current };
+          delete next[selectedKey.prefix];
+          return next;
+        });
+      }
       setHiddenKeyIds((current) =>
         selectedKey ? [...new Set([...current, selectedKey.id])] : current,
       );
