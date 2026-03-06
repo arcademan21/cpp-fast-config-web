@@ -4,6 +4,8 @@ export const messages = {
   es: {
     common: {
       getStarted: "Obtener enlace de descarga",
+      goToDashboard: "Ir al panel",
+      logout: "Cerrar sesión",
       viewDocs: "Ver documentación",
       readDocumentation: "Leer documentación",
       viewOnGitHub: "Ver en GitHub",
@@ -270,6 +272,8 @@ export const messages = {
   en: {
     common: {
       getStarted: "Get access",
+      goToDashboard: "Go to dashboard",
+      logout: "Logout",
       viewDocs: "View Docs",
       readDocumentation: "Read Documentation",
       viewOnGitHub: "View on GitHub",

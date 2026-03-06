@@ -7,7 +7,7 @@ export default async function ApiKeysPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/login");
+    redirect("/");
   }
 
   return (

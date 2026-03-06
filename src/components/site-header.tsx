@@ -3,13 +3,16 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 import { LanguageToggle } from "./language-toggle";
 import { ThemeToggle } from "./theme-toggle";
 import { useI18n } from "./i18n-provider";
 
 export function SiteHeader() {
   const { t } = useI18n();
+  const { status } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const isAuthenticated = status === "authenticated";
 
   const navItems = [
     { href: "/#features", label: t.header.features },
@@ -17,7 +20,10 @@ export function SiteHeader() {
     { href: "/#examples", label: t.header.examples },
     { href: "/#ci", label: t.header.ci },
     { href: "/#license", label: t.header.license },
-    { href: "/access", label: t.header.access },
+    {
+      href: isAuthenticated ? "/dashboard" : "/access",
+      label: isAuthenticated ? t.common.goToDashboard : t.header.access,
+    },
   ];
 
   return (
@@ -52,12 +58,30 @@ export function SiteHeader() {
           <div className="hidden items-center gap-2 md:flex">
             <LanguageToggle />
             <ThemeToggle />
-            <Link
-              href="/access"
-              className="inline-flex h-9 items-center rounded-md bg-slate-900 px-3 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-            >
-              {t.common.getStarted}
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="inline-flex h-9 items-center rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
+                >
+                  {t.common.goToDashboard}
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="inline-flex h-9 items-center rounded-md bg-slate-900 px-3 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                >
+                  {t.common.logout}
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/access"
+                className="inline-flex h-9 items-center rounded-md bg-slate-900 px-3 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+              >
+                {t.common.getStarted}
+              </Link>
+            )}
           </div>
           <button
             type="button"
@@ -103,13 +127,35 @@ export function SiteHeader() {
                 <LanguageToggle />
                 <ThemeToggle />
               </div>
-              <Link
-                href="/access"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="inline-flex h-9 w-full items-center justify-center rounded-md bg-slate-900 px-3 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-              >
-                {t.common.getStarted}
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="inline-flex h-9 w-full items-center justify-center rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
+                  >
+                    {t.common.goToDashboard}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      void signOut({ callbackUrl: "/" });
+                    }}
+                    className="inline-flex h-9 w-full items-center justify-center rounded-md bg-slate-900 px-3 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                  >
+                    {t.common.logout}
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/access"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="inline-flex h-9 w-full items-center justify-center rounded-md bg-slate-900 px-3 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                >
+                  {t.common.getStarted}
+                </Link>
+              )}
             </div>
 
             <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">

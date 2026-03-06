@@ -6,6 +6,7 @@ import {
   useMemo,
   useSyncExternalStore,
 } from "react";
+import { SessionProvider } from "next-auth/react";
 import type { Locale } from "@/i18n/messages";
 import { messages } from "@/i18n/messages";
 
@@ -67,7 +68,11 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     [locale],
   );
 
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+  return (
+    <SessionProvider>
+      <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
+    </SessionProvider>
+  );
 }
 
 export function useI18n() {
