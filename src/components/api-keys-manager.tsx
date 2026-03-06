@@ -174,7 +174,7 @@ export function ApiKeysManager() {
 
   const installCommand = useMemo(() => {
     const keyForCommand = latestKey ?? t.apiKeys.commandKeyPlaceholder;
-    return `curl -fsSL ${installerUrl} | bash -s -- "$PWD" --key ${keyForCommand} --api-base-url "${installerApiBaseUrl}" --version "${installerVersion}"`;
+    return `tmp_installer="$(mktemp)" && curl -fsSL ${installerUrl} -o "$tmp_installer" && bash "$tmp_installer" "$PWD" --key ${keyForCommand} --api-base-url "${installerApiBaseUrl}" --version "${installerVersion}" && rm -f "$tmp_installer"`;
   }, [latestKey, t.apiKeys.commandKeyPlaceholder]);
 
   const loadKeys = useCallback(async () => {
