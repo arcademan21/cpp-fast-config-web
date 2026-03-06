@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { callBackendProxy } from "@/lib/proxy-client";
 import { useI18n } from "@/components/i18n-provider";
 
@@ -10,6 +12,7 @@ const authRegisterEndpoint =
 
 export default function RegisterPage() {
   const { t } = useI18n();
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +32,22 @@ export default function RegisterPage() {
         endpoint: authRegisterEndpoint,
         data: { email, password },
       });
-      setMessage(t.registerForm.success);
+
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+        callbackUrl: "/dashboard",
+      });
+
+      if (signInResult?.error) {
+        setMessage(t.registerForm.success);
+        router.push("/login");
+        return;
+      }
+
+      router.push("/dashboard");
+      router.refresh();
     } catch (submitError) {
       setError(
         submitError instanceof Error
