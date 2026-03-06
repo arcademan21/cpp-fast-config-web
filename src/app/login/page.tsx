@@ -47,39 +47,6 @@ export default function LoginPage() {
           {t.loginForm.subtitle}
         </p>
 
-        <div className="space-y-2 border-b border-slate-200 pb-4 dark:border-slate-800">
-          <button
-            type="button"
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md border border-rose-400 bg-rose-500 px-4 text-sm font-semibold text-white transition hover:bg-rose-400 dark:border-rose-500 dark:bg-rose-600 dark:text-white dark:hover:bg-rose-500"
-          >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              className="h-5 w-5 text-white"
-              fill="currentColor"
-            >
-              <path d="M12 11.9v3.3h4.7c-.2 1.1-1.3 3.3-4.7 3.3-2.8 0-5.2-2.4-5.2-5.4s2.4-5.4 5.2-5.4c1.6 0 2.6.7 3.2 1.3l2.2-2.1C15.9 5.4 14.1 4.6 12 4.6 7.6 4.6 4 8.3 4 12.8S7.6 21 12 21c6.9 0 8-6.5 7.6-9.1H12Z" />
-            </svg>
-            {t.loginForm.google}
-          </button>
-          <button
-            type="button"
-            onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
-            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md border border-slate-900 bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-black dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-          >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              className="h-5 w-5"
-              fill="currentColor"
-            >
-              <path d="M12 2C6.5 2 2 6.6 2 12.3c0 4.6 2.9 8.5 6.9 9.8.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.2-1.1-1.6-1.1-1.6-.9-.6.1-.6.1-.6 1 .1 1.6 1 1.6 1 .9 1.6 2.4 1.1 3 .8.1-.7.4-1.1.7-1.4-2.2-.3-4.6-1.1-4.6-5.2 0-1.2.4-2.2 1-3-.1-.3-.4-1.4.1-2.9 0 0 .9-.3 3 .9a10 10 0 0 1 5.4 0c2.1-1.2 3-.9 3-.9.5 1.5.2 2.6.1 2.9.7.8 1 1.8 1 3 0 4.1-2.4 4.9-4.7 5.2.4.3.7 1 .7 2v2.9c0 .3.2.6.7.5A10.4 10.4 0 0 0 22 12.3C22 6.6 17.5 2 12 2Z" />
-            </svg>
-            {t.loginForm.github}
-          </button>
-        </div>
-
         <form className="space-y-3" onSubmit={onSubmit}>
           <input
             type="email"
