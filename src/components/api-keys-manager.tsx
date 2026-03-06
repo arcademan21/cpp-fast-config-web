@@ -36,6 +36,7 @@ const installerApiBaseUrl =
   "https://cpp-fast-config-backend.vercel.app/api";
 const installerVersion = process.env.NEXT_PUBLIC_INSTALLER_VERSION ?? "latest";
 const revealedKeysStorageKey = "cppfc.revealedApiKeysByPrefix.v1";
+const selectedApiKeyStorageKey = "cppfc.selectedApiKeyId.v1";
 
 function normalizeMethod(value: string): string {
   const method = value.trim().toUpperCase();
@@ -223,11 +224,27 @@ export function ApiKeysManager() {
   }, []);
 
   useEffect(() => {
+    const storedSelectedId = localStorage.getItem(selectedApiKeyStorageKey);
+    if (storedSelectedId) {
+      setSelectedId(storedSelectedId);
+    }
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem(
       revealedKeysStorageKey,
       JSON.stringify(revealedKeysByPrefix),
     );
   }, [revealedKeysByPrefix]);
+
+  useEffect(() => {
+    if (!selectedId) {
+      localStorage.removeItem(selectedApiKeyStorageKey);
+      return;
+    }
+
+    localStorage.setItem(selectedApiKeyStorageKey, selectedId);
+  }, [selectedId]);
 
   const selectedKey = useMemo(
     () => keys.find((key) => key.id === selectedId) ?? null,
@@ -299,7 +316,13 @@ export function ApiKeysManager() {
         } else if (
           !normalizedVisible.some((item) => item.id === nextSelectedId)
         ) {
-          setSelectedId(normalizedVisible[0].id);
+          const withStoredValue = normalizedVisible.find(
+            (item) =>
+              typeof revealedKeysByPrefix[item.prefix] === "string" &&
+              revealedKeysByPrefix[item.prefix].length > 0,
+          );
+
+          setSelectedId(withStoredValue?.id ?? normalizedVisible[0].id);
         } else if (nextSelectedId !== selectedId) {
           setSelectedId(nextSelectedId);
         }
@@ -311,7 +334,12 @@ export function ApiKeysManager() {
         setLoading(false);
       }
     },
-    [selectedId, t.apiKeys.errLoad, t.apiKeys.fallbackPrefix],
+    [
+      revealedKeysByPrefix,
+      selectedId,
+      t.apiKeys.errLoad,
+      t.apiKeys.fallbackPrefix,
+    ],
   );
 
   useEffect(() => {
