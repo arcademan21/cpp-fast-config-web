@@ -28,6 +28,14 @@ const rotateSuffix =
 const revokeSuffix =
   process.env.NEXT_PUBLIC_API_KEYS_REVOKE_SUFFIX ?? "/revoke";
 
+const installerUrl =
+  process.env.NEXT_PUBLIC_INSTALLER_URL ??
+  "https://raw.githubusercontent.com/arcademan21/cpp-fast-config/main/install.sh";
+const installerApiBaseUrl =
+  process.env.NEXT_PUBLIC_EXTERNAL_API_BASE_URL ??
+  "https://cpp-fast-config-backend.vercel.app/api";
+const installerVersion = process.env.NEXT_PUBLIC_INSTALLER_VERSION ?? "latest";
+
 function normalizeMethod(value: string): string {
   const method = value.trim().toUpperCase();
   return method.length > 0 ? method : "POST";
@@ -166,7 +174,7 @@ export function ApiKeysManager() {
 
   const installCommand = useMemo(() => {
     const keyForCommand = latestKey ?? t.apiKeys.commandKeyPlaceholder;
-    return `curl -fsSL <INSTALLER_URL> | sh -s -- --key ${keyForCommand}`;
+    return `curl -fsSL ${installerUrl} | bash -s -- "$PWD" --key ${keyForCommand} --api-base-url "${installerApiBaseUrl}" --version "${installerVersion}"`;
   }, [latestKey, t.apiKeys.commandKeyPlaceholder]);
 
   const loadKeys = useCallback(async () => {
