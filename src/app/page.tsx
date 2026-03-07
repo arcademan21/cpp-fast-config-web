@@ -390,7 +390,7 @@ export default function Home() {
           id="license"
           className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
         >
-          <h2 className="text-2xl font-bold">License</h2>
+          <h2 className="text-2xl font-bold">{t.landing.licenseTitle}</h2>
           <div className="mt-4 rounded-xl border border-slate-200 p-5 dark:border-slate-800">
             <p className="text-sm text-slate-700 dark:text-slate-300">
               {t.landing.licenseBody}

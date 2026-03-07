@@ -49,11 +49,11 @@ export const messages = {
       quickWorkflow: "Flujo rápido",
       workflowDescription:
         "Toolkit terminal-first para flujos diarios en C++: init, configure, build, test, run, diagnosis y adopción de proyectos existentes.",
-      whyTitle: "Why Cpp Fast Config",
-      featuresTitle: "Features",
-      examplesTitle: "Examples",
+      whyTitle: "Por Qué Cpp Fast Config",
+      featuresTitle: "Características",
+      examplesTitle: "Ejemplos",
       examplesSubtitle: "Snippets reales del flujo de trabajo con cpp.",
-      docsPreviewTitle: "Documentation preview",
+      docsPreviewTitle: "Vista Previa De Documentación",
       docsCard1Title: "Getting Started",
       docsCard1Body: "Flujo autenticado: cuenta, API key e instalación segura.",
       docsCard2Title: "CLI + Scaffolding",
@@ -63,6 +63,7 @@ export const messages = {
         "CI con CMake presets y E2E matrix en ubuntu/macos (bash + zsh) más baseline de Windows con bash.",
       licenseBody:
         "Licencia propietaria no comercial. El uso comercial requiere autorización previa por escrito.",
+      licenseTitle: "Licencia",
       licenseCta: "Ver LICENSE",
       startNow: "Empieza ahora",
       startNowBody: "Solicita acceso y consulta la documentación completa.",
@@ -342,6 +343,7 @@ export const messages = {
         "CI with CMake presets and E2E matrix on ubuntu/macos (bash + zsh) plus Windows bash baseline.",
       licenseBody:
         "Non-commercial proprietary license. Commercial use requires prior written authorization.",
+      licenseTitle: "License",
       licenseCta: "View LICENSE",
       startNow: "Start now",
       startNowBody: "Request access and explore full documentation.",
