@@ -33,6 +33,7 @@ export const messages = {
     },
     footer: {
       nonCommercial: "Licencia no comercial.",
+      copyright: "© {year} {author}. Todos los derechos reservados.",
     },
     landing: {
       heroTitle:
@@ -312,6 +313,7 @@ export const messages = {
     },
     footer: {
       nonCommercial: "Non-commercial license.",
+      copyright: "© {year} {author}. All rights reserved.",
     },
     landing: {
       heroTitle:
