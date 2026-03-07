@@ -1,5 +1,6 @@
 "use client";
 
+import "./index-stars-bg.css";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { CommandBlock } from "@/components/command-block";
@@ -221,213 +222,226 @@ export default function Home() {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-x-clip bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="index-stars-container relative min-h-screen overflow-x-clip bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 opacity-45 bg-[radial-gradient(circle_at_1px_1px,rgba(148,163,184,0.24)_1px,transparent_0)] bg-size-[24px_24px] dark:opacity-30 dark:bg-[radial-gradient(circle_at_1px_1px,rgba(71,85,105,0.35)_1px,transparent_0)]"
+        className="pointer-events-none absolute inset-0 -z-20 opacity-45 bg-[radial-gradient(circle_at_1px_1px,rgba(148,163,184,0.24)_1px,transparent_0)] bg-size-[24px_24px] dark:opacity-30 dark:bg-[radial-gradient(circle_at_1px_1px,rgba(71,85,105,0.35)_1px,transparent_0)]"
       />
-      <SiteHeader />
-      <main>
-        <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-24">
-          <div className="min-w-0 space-y-6">
-            <div className="flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full border border-slate-300 px-3 py-1 dark:border-slate-700">
-                v1.0.0
-              </span>
-              <span className="rounded-full border border-slate-300 px-3 py-1 dark:border-slate-700">
-                macOS/Linux/Windows
-              </span>
-              <span className="rounded-full border border-slate-300 px-3 py-1 dark:border-slate-700">
-                CMake + VS Code
-              </span>
-            </div>
-            <h1 className="wrap-break-word text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-              {t.landing.heroTitle}
-            </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-300">
-              {t.landing.heroSubtitle}
-            </p>
-            {isAuthenticated ? (
-              <HomeInstallerCommandCard />
-            ) : (
-              <div className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
-                <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                  {t.landing.quickInstall}
-                </p>
-                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                  {t.landing.accessDescription}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <Link
-                    href="/access"
-                    className="inline-flex rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-                  >
-                    {t.common.getStarted}
-                  </Link>
-                  <Link
-                    href="/docs"
-                    className="inline-flex rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
-                  >
-                    {t.common.viewDocs}
-                  </Link>
-                </div>
+      <div aria-hidden className="index-stars-bg">
+        <div id="stars" />
+        <div id="stars2" />
+        <div id="stars3" />
+        <div className="shooting-stars">
+          <span />
+          <span />
+          <span />
+          <span />
+        </div>
+      </div>
+      <div className="relative z-10">
+        <SiteHeader />
+        <main>
+          <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-24">
+            <div className="min-w-0 space-y-6">
+              <div className="flex flex-wrap gap-2 text-xs">
+                <span className="rounded-full border border-slate-300 px-3 py-1 dark:border-slate-700">
+                  v1.0.0
+                </span>
+                <span className="rounded-full border border-slate-300 px-3 py-1 dark:border-slate-700">
+                  macOS/Linux/Windows
+                </span>
+                <span className="rounded-full border border-slate-300 px-3 py-1 dark:border-slate-700">
+                  CMake + VS Code
+                </span>
               </div>
-            )}
-          </div>
-          <div className="min-w-0 space-y-4">
-            <InstallerFlowTerminal
-              title={flowButtons.terminalTitle}
-              flows={installerFlows}
-            />
-            <CommandBlock
-              code={heroFlow}
-              title={t.landing.quickWorkflow}
-              showCopy={false}
-            />
-            <div className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
-              <p className="text-sm text-slate-600 dark:text-slate-300">
-                {t.landing.workflowDescription}
+              <h1 className="wrap-break-word text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                {t.landing.heroTitle}
+              </h1>
+              <p className="text-lg text-slate-600 dark:text-slate-300">
+                {t.landing.heroSubtitle}
               </p>
+              {isAuthenticated ? (
+                <HomeInstallerCommandCard />
+              ) : (
+                <div className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
+                  <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                    {t.landing.quickInstall}
+                  </p>
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                    {t.landing.accessDescription}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <Link
+                      href="/access"
+                      className="inline-flex rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+                    >
+                      {t.common.getStarted}
+                    </Link>
+                    <Link
+                      href="/docs"
+                      className="inline-flex rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
+                    >
+                      {t.common.viewDocs}
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        </section>
-
-        <section
-          id="features"
-          className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
-        >
-          <h2 className="text-2xl font-bold">{t.landing.whyTitle}</h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {t.landing.whyCards.map((item) => (
-              <article
-                key={item}
-                className="rounded-xl border border-slate-200 p-4 dark:border-slate-800"
-              >
-                <p className="text-sm text-slate-700 dark:text-slate-300">
-                  {item}
+            <div className="min-w-0 space-y-4">
+              <InstallerFlowTerminal
+                title={flowButtons.terminalTitle}
+                flows={installerFlows}
+              />
+              <CommandBlock
+                code={heroFlow}
+                title={t.landing.quickWorkflow}
+                showCopy={false}
+              />
+              <div className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  {t.landing.workflowDescription}
                 </p>
-              </article>
-            ))}
-          </div>
-        </section>
-        <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold">{t.landing.featuresTitle}</h2>
-          <ul className="mt-6 space-y-3">
-            {t.landing.featureItems.map((item) => (
-              <li
-                key={item}
-                className="rounded-lg border border-slate-200 px-4 py-3 text-sm dark:border-slate-800"
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
-        </section>
+              </div>
+            </div>
+          </section>
 
-        <section
-          id="examples"
-          className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
-        >
-          <h2 className="text-2xl font-bold">{t.landing.examplesTitle}</h2>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-            {t.landing.examplesSubtitle}
-          </p>
-          <div className="mt-6">
-            <SnippetTabs />
-          </div>
-        </section>
+          <section
+            id="features"
+            className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
+          >
+            <h2 className="text-2xl font-bold">{t.landing.whyTitle}</h2>
+            <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {t.landing.whyCards.map((item) => (
+                <article
+                  key={item}
+                  className="rounded-xl border border-slate-200 p-4 dark:border-slate-800"
+                >
+                  <p className="text-sm text-slate-700 dark:text-slate-300">
+                    {item}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+          <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-bold">{t.landing.featuresTitle}</h2>
+            <ul className="mt-6 space-y-3">
+              {t.landing.featureItems.map((item) => (
+                <li
+                  key={item}
+                  className="rounded-lg border border-slate-200 px-4 py-3 text-sm dark:border-slate-800"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </section>
 
-        <section
-          id="docs"
-          className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
-        >
-          <h2 className="text-2xl font-bold">{t.landing.docsPreviewTitle}</h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <article className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
-              <h3 className="text-base font-semibold">
-                {t.landing.docsCard1Title}
-              </h3>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                {t.landing.docsCard1Body}
-              </p>
-              <Link
-                href="/docs/getting-started"
-                className="mt-3 inline-block text-sm font-semibold underline"
-              >
-                {t.common.readDocumentation}
-              </Link>
-            </article>
-            <article className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
-              <h3 className="text-base font-semibold">
-                {t.landing.docsCard2Title}
-              </h3>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                {t.landing.docsCard2Body}
-              </p>
-              <Link
-                href="/docs/cli"
-                className="mt-3 inline-block text-sm font-semibold underline"
-              >
-                {t.landing.docsCard2Cta}
-              </Link>
-            </article>
-          </div>
-        </section>
-
-        <section
-          id="ci"
-          className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
-        >
-          <h2 className="text-2xl font-bold">CI</h2>
-          <div className="mt-4 rounded-xl border border-slate-200 p-5 dark:border-slate-800">
-            <p className="text-sm text-slate-700 dark:text-slate-300">
-              {t.landing.ciBody}
-            </p>
-          </div>
-        </section>
-
-        <section
-          id="license"
-          className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
-        >
-          <h2 className="text-2xl font-bold">{t.landing.licenseTitle}</h2>
-          <div className="mt-4 rounded-xl border border-slate-200 p-5 dark:border-slate-800">
-            <p className="text-sm text-slate-700 dark:text-slate-300">
-              {t.landing.licenseBody}
-            </p>
-            <Link
-              href="/docs/license"
-              className="mt-3 inline-block text-sm font-semibold underline"
-            >
-              {t.landing.licenseCta}
-            </Link>
-          </div>
-        </section>
-
-        <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 p-6 dark:border-slate-800">
-            <h2 className="text-2xl font-bold">{t.landing.startNow}</h2>
+          <section
+            id="examples"
+            className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
+          >
+            <h2 className="text-2xl font-bold">{t.landing.examplesTitle}</h2>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-              {t.landing.startNowBody}
+              {t.landing.examplesSubtitle}
             </p>
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="mt-6">
+              <SnippetTabs />
+            </div>
+          </section>
+
+          <section
+            id="docs"
+            className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
+          >
+            <h2 className="text-2xl font-bold">{t.landing.docsPreviewTitle}</h2>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <article className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
+                <h3 className="text-base font-semibold">
+                  {t.landing.docsCard1Title}
+                </h3>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                  {t.landing.docsCard1Body}
+                </p>
+                <Link
+                  href="/docs/getting-started"
+                  className="mt-3 inline-block text-sm font-semibold underline"
+                >
+                  {t.common.readDocumentation}
+                </Link>
+              </article>
+              <article className="rounded-xl border border-slate-200 p-5 dark:border-slate-800">
+                <h3 className="text-base font-semibold">
+                  {t.landing.docsCard2Title}
+                </h3>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                  {t.landing.docsCard2Body}
+                </p>
+                <Link
+                  href="/docs/cli"
+                  className="mt-3 inline-block text-sm font-semibold underline"
+                >
+                  {t.landing.docsCard2Cta}
+                </Link>
+              </article>
+            </div>
+          </section>
+
+          <section
+            id="ci"
+            className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
+          >
+            <h2 className="text-2xl font-bold">CI</h2>
+            <div className="mt-4 rounded-xl border border-slate-200 p-5 dark:border-slate-800">
+              <p className="text-sm text-slate-700 dark:text-slate-300">
+                {t.landing.ciBody}
+              </p>
+            </div>
+          </section>
+
+          <section
+            id="license"
+            className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
+          >
+            <h2 className="text-2xl font-bold">{t.landing.licenseTitle}</h2>
+            <div className="mt-4 rounded-xl border border-slate-200 p-5 dark:border-slate-800">
+              <p className="text-sm text-slate-700 dark:text-slate-300">
+                {t.landing.licenseBody}
+              </p>
               <Link
-                href="/access"
-                className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white dark:bg-slate-100 dark:text-slate-900"
+                href="/docs/license"
+                className="mt-3 inline-block text-sm font-semibold underline"
               >
-                {t.common.getStarted}
-              </Link>
-              <Link
-                href="/access"
-                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold dark:border-slate-700"
-              >
-                {t.header.access}
+                {t.landing.licenseCta}
               </Link>
             </div>
-          </div>
-        </section>
-      </main>
-      <SiteFooter />
+          </section>
+
+          <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
+            <div className="rounded-2xl border border-slate-200 p-6 dark:border-slate-800">
+              <h2 className="text-2xl font-bold">{t.landing.startNow}</h2>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                {t.landing.startNowBody}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link
+                  href="/access"
+                  className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white dark:bg-slate-100 dark:text-slate-900"
+                >
+                  {t.common.getStarted}
+                </Link>
+                <Link
+                  href="/access"
+                  className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold dark:border-slate-700"
+                >
+                  {t.header.access}
+                </Link>
+              </div>
+            </div>
+          </section>
+        </main>
+        <SiteFooter />
+      </div>
     </div>
   );
 }
