@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { LanguageToggle } from "./language-toggle";
 import { ThemeToggle } from "./theme-toggle";
@@ -11,20 +12,24 @@ import { useI18n } from "./i18n-provider";
 export function SiteHeader() {
   const { t } = useI18n();
   const { status } = useSession();
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isAuthenticated = status === "authenticated";
+  const isInDashboard = pathname.startsWith("/dashboard");
 
-  const navItems = [
+  const navItems: Array<{ href: string; label: string }> = [
     { href: "/#features", label: t.header.features },
     { href: "/#docs", label: t.header.docs },
     { href: "/#examples", label: t.header.examples },
     { href: "/#ci", label: t.header.ci },
     { href: "/#license", label: t.header.license },
-    {
-      href: isAuthenticated ? "/dashboard" : "/access",
-      label: isAuthenticated ? t.common.goToDashboard : t.header.access,
-    },
   ];
+
+  if (!isAuthenticated) {
+    navItems.push({ href: "/access", label: t.header.access });
+  } else if (!isInDashboard) {
+    navItems.push({ href: "/dashboard", label: t.common.goToDashboard });
+  }
 
   return (
     <>
@@ -60,12 +65,14 @@ export function SiteHeader() {
             <ThemeToggle />
             {isAuthenticated ? (
               <>
-                <Link
-                  href="/dashboard"
-                  className="inline-flex h-9 items-center rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
-                >
-                  {t.common.goToDashboard}
-                </Link>
+                {!isInDashboard ? (
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex h-9 items-center rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
+                  >
+                    {t.common.goToDashboard}
+                  </Link>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => signOut({ callbackUrl: "/" })}
@@ -129,13 +136,15 @@ export function SiteHeader() {
               </div>
               {isAuthenticated ? (
                 <>
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="inline-flex h-9 w-full items-center justify-center rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
-                  >
-                    {t.common.goToDashboard}
-                  </Link>
+                  {!isInDashboard ? (
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="inline-flex h-9 w-full items-center justify-center rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
+                    >
+                      {t.common.goToDashboard}
+                    </Link>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => {

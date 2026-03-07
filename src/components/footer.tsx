@@ -2,10 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useI18n } from "./i18n-provider";
 
 export function SiteFooter() {
   const { t } = useI18n();
+  const { status } = useSession();
+  const isUnauthenticated = status === "unauthenticated";
 
   return (
     <footer className="border-t border-slate-200 py-10 dark:border-slate-800">
@@ -21,7 +24,9 @@ export function SiteFooter() {
         </Link>
         <div className="flex items-center gap-4">
           <Link href="/docs">{t.common.docs}</Link>
-          <Link href="/access">{t.header.access}</Link>
+          {isUnauthenticated ? (
+            <Link href="/access">{t.header.access}</Link>
+          ) : null}
         </div>
         <p>{t.footer.nonCommercial}</p>
       </div>

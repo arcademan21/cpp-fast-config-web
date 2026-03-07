@@ -114,8 +114,13 @@ export const messages = {
       title: "Getting Started",
       subtitle: "Acceso autenticado para comenzar en segundos.",
       quickInstall: "Paso 1: Crear cuenta",
+      quickInstallSteps:
+        "1) Abre el portal de acceso\n2) Regístrate o inicia sesión\n3) Solicita aprobación si tu cuenta está pendiente",
       manualInstall: "Paso 2: Generar API key",
+      manualInstallSteps:
+        "1) Abre tu panel\n2) Ve a API Keys\n3) Crea o selecciona tu key activa\n4) Copia el comando autenticado",
       shellReload: "Paso 3: Instalar con comando autenticado",
+      shellReloadTitle: "Installer",
       shellReloadBody:
         "Si no tienes acceso aprobado, solicita habilitación antes de instalar.",
       bootstrap: "Acceso",
@@ -258,6 +263,7 @@ export const messages = {
       keyPrefix: "Prefijo",
       status: "Estado",
       created: "Creada",
+      actions: "Acciones",
       fallbackPrefix: "<sin-prefijo>",
       commandKeyPlaceholder: "<TU_KEY>",
       errLoad: "No se pudieron cargar las keys",
@@ -385,8 +391,13 @@ export const messages = {
       title: "Getting Started",
       subtitle: "Authenticated access to get running in seconds.",
       quickInstall: "Step 1: Create account",
+      quickInstallSteps:
+        "1) Open the access portal\n2) Register or sign in\n3) Request approval if your account is pending",
       manualInstall: "Step 2: Generate API key",
+      manualInstallSteps:
+        "1) Open your dashboard\n2) Go to API Keys\n3) Create or select your active key\n4) Copy the authenticated command",
       shellReload: "Step 3: Install with authenticated command",
+      shellReloadTitle: "Installer",
       shellReloadBody:
         "If you don't have approved access yet, request approval before installing.",
       bootstrap: "Access",
@@ -526,6 +537,7 @@ export const messages = {
       keyPrefix: "Key prefix",
       status: "Status",
       created: "Created",
+      actions: "Actions",
       fallbackPrefix: "<no-prefix>",
       commandKeyPlaceholder: "<YOUR_KEY>",
       errLoad: "Unable to load API keys",

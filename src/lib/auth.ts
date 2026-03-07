@@ -133,6 +133,11 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60,
+    updateAge: 10 * 60,
+  },
+  jwt: {
+    maxAge: 24 * 60 * 60,
   },
   pages: {
     signIn: "/login",

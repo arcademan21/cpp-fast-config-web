@@ -437,8 +437,8 @@ export function ApiKeysManager() {
     }
   };
 
-  const onRevoke = async () => {
-    if (!selectedKey) {
+  const onRevoke = async (key: ApiKey) => {
+    if (!key) {
       return;
     }
 
@@ -450,24 +450,22 @@ export function ApiKeysManager() {
       await callBackendProxy({
         method: normalizeMethod(revokeMethod),
         endpoint: buildActionEndpoint(
-          selectedKey.id,
+          key.id,
           revokeEndpointTemplate,
           revokeSuffix,
         ),
       });
 
       setMessage(t.apiKeys.msgRevoked);
-      if (selectedKey) {
-        setRevealedKeysByPrefix((current) => {
-          if (!(selectedKey.prefix in current)) {
-            return current;
-          }
+      setRevealedKeysByPrefix((current) => {
+        if (!(key.prefix in current)) {
+          return current;
+        }
 
-          const next = { ...current };
-          delete next[selectedKey.prefix];
-          return next;
-        });
-      }
+        const next = { ...current };
+        delete next[key.prefix];
+        return next;
+      });
       await loadKeys();
     } catch (revokeError) {
       setError(
@@ -510,14 +508,6 @@ export function ApiKeysManager() {
         >
           {t.apiKeys.rotate}
         </button>
-        <button
-          type="button"
-          onClick={onRevoke}
-          disabled={actionLoading || !selectedKey}
-          className="rounded-md border border-rose-300 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-50 disabled:opacity-60 dark:border-rose-700 dark:text-rose-300 dark:hover:bg-rose-950/40"
-        >
-          {t.apiKeys.revoke}
-        </button>
       </div>
 
       {loading ? (
@@ -542,12 +532,15 @@ export function ApiKeysManager() {
               <th className="px-4 py-3 text-left font-semibold">
                 {t.apiKeys.created}
               </th>
+              <th className="px-4 py-3 text-right font-semibold">
+                {t.apiKeys.actions}
+              </th>
             </tr>
           </thead>
           <tbody>
             {visibleKeys.length === 0 ? (
               <tr className="border-t border-slate-200 dark:border-slate-800">
-                <td className="px-4 py-3 text-slate-500" colSpan={4}>
+                <td className="px-4 py-3 text-slate-500" colSpan={5}>
                   {t.apiKeys.noKeys}
                 </td>
               </tr>
@@ -568,6 +561,32 @@ export function ApiKeysManager() {
                   <td className="px-4 py-3 font-mono">{key.prefix}</td>
                   <td className="px-4 py-3">{key.status}</td>
                   <td className="px-4 py-3">{key.createdAt}</td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      type="button"
+                      onClick={() => void onRevoke(key)}
+                      disabled={actionLoading}
+                      aria-label={`${t.apiKeys.revoke} ${key.prefix}`}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-rose-300 text-rose-700 transition hover:bg-rose-50 disabled:opacity-60 dark:border-rose-700 dark:text-rose-300 dark:hover:bg-rose-950/40"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M3 6h18" />
+                        <path d="M8 6V4h8v2" />
+                        <path d="M19 6l-1 14H6L5 6" />
+                        <path d="M10 11v6" />
+                        <path d="M14 11v6" />
+                      </svg>
+                    </button>
+                  </td>
                 </tr>
               ))
             )}

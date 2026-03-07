@@ -7,9 +7,14 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAccessPage = pathname === "/access";
   const isDashboardPage = pathname.startsWith("/dashboard");
 
   if (isAuthPage && token) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  if (isAccessPage && token) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -21,5 +26,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/register", "/dashboard/:path*"],
+  matcher: ["/login", "/register", "/access", "/dashboard/:path*"],
 };
